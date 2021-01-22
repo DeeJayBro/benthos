@@ -16,6 +16,25 @@ func (k *kafkaReader) Setup(sesh sarama.ConsumerGroupSession) error {
 	k.session = sesh
 	k.cMut.Unlock()
 	k.mRebalanced.Incr(1)
+
+	if k.conf.ConsumeFromNewest {
+		for _, balancedTopics := range k.balancedTopics {
+			partitions, err := k.client.Partitions(balancedTopics)
+			if err != nil {
+					return err
+			}
+			for _, partition := range partitions {
+					offset, err := k.client.GetOffset(
+			balancedTopics, partition, sarama.OffsetNewest,
+					)
+					if err == nil {
+						sesh.MarkOffset(balancedTopics, partition, offset, "")
+					} else {
+						return err
+					}
+			}
+		}
+	}
 	return nil
 }
 
@@ -90,11 +109,16 @@ func (k *kafkaReader) ConsumeClaim(sess sarama.ConsumerGroupSession, claim saram
 //------------------------------------------------------------------------------
 
 func (k *kafkaReader) connectBalancedTopics(ctx context.Context, config *sarama.Config) error {
-	// Start a new consumer group
-	group, err := sarama.NewConsumerGroup(k.addresses, k.conf.ConsumerGroup, config)
+	client, err := sarama.NewClient(k.addresses, config)
 	if err != nil {
-		return err
+			return err
 	}
+	// Start a new consumer group
+	group, err := sarama.NewConsumerGroupFromClient(k.conf.ConsumerGroup, client)
+	if err != nil {
+			return err
+	}
+	k.client = client
 
 	// Handle errors
 	go func() {

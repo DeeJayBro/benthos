@@ -72,6 +72,7 @@ You can access these metadata fields using [function interpolation](/docs/config
 			docs.FieldCommon("consumer_group", "An identifier for the consumer group of the connection."),
 			docs.FieldCommon("client_id", "An identifier for the client connection."),
 			docs.FieldAdvanced("start_from_oldest", "If an offset is not found for a topic parition, determines whether to consume from the oldest available offset, otherwise messages are consumed from the latest offset."),
+			docs.FieldAdvanced("consume_from_newest", "Consume from the latest offset each time a new connection is established")
 			docs.FieldCommon(
 				"checkpoint_limit", "EXPERIMENTAL: The maximum number of messages of the same topic and partition that can be processed at a given time. Increasing this limit enables parallel processing and batching at the output level to work on individual partitions. Any given offset will not be committed unless all messages under that offset are delivered in order to preserve at least once delivery guarantees.",
 			).AtVersion("3.33.0"),
@@ -163,6 +164,7 @@ type kafkaReader struct {
 	consumerDoneCtx context.Context
 	msgChan         chan asyncMessage
 	session         offsetMarker
+	client          sarama.Client
 
 	mRebalanced metrics.StatCounter
 
