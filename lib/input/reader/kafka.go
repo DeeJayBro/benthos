@@ -35,7 +35,7 @@ type KafkaConfig struct {
 	Topic               string                   `json:"topic" yaml:"topic"`
 	Partition           int32                    `json:"partition" yaml:"partition"`
 	StartFromOldest     bool                     `json:"start_from_oldest" yaml:"start_from_oldest"`
-	ConsumFromNewest    bool                     `json:"consume_from_newest" yaml:"consume_from_newest"`
+	ConsumeFromNewest    bool                     `json:"consume_from_newest" yaml:"consume_from_newest"`
 	TargetVersion       string                   `json:"target_version" yaml:"target_version"`
 	// TODO: V4 Remove this.
 	MaxBatchCount int                `json:"max_batch_count" yaml:"max_batch_count"`

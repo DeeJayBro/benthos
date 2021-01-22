@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### New
 
 - Field `key` in output `redis_list` now supports interpolation functions.
+- Field `consume_from_newest` added to the `kafka` input.
 
 ## 3.38.0 - 2021-01-18
 
