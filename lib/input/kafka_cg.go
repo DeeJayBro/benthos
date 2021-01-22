@@ -28,6 +28,7 @@ func (k *kafkaReader) Setup(sesh sarama.ConsumerGroupSession) error {
 			balancedTopics, partition, sarama.OffsetNewest,
 					)
 					if err == nil {
+						k.log.Infof("Newest offset %x", offset)
 						sesh.MarkOffset(balancedTopics, partition, offset, "")
 					} else {
 						return err
